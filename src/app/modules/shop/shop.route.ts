@@ -1,6 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { ShopController } from './shop.controller';
 import uploadFileHandler from '../../middlewares/uploadFileHandler';
+import validateRequest from '../../middlewares/validateRequest';
+import { ShopValidation } from './shop.validation';
+import dataParseHandler from '../../middlewares/dataParseHandler';
 
 const router = express.Router();
 
@@ -11,6 +14,7 @@ router.post(
     req.body = JSON.parse(req.body.data);
     next();
   },
+  validateRequest(ShopValidation.cretaeShopSchema),
   ShopController.createShop
 );
 router.patch(
@@ -20,6 +24,7 @@ router.patch(
     req.body = JSON.parse(req.body.data);
     next();
   },
+  validateRequest(ShopValidation.cretaeShopSchema),
   ShopController.updateShop
 );
 router.patch('/shop-off-status/:id', ShopController.shopOffStatus);
