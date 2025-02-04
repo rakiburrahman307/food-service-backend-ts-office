@@ -8,7 +8,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
-
+// create user
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   //set role
   payload.role = USER_ROLES.USER;
@@ -18,7 +18,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   }
 
   //send email
-  const otp = generateOTP();
+  const otp = generateOTP(6);
   const values = {
     name: createUser.name,
     otp: otp,
@@ -39,7 +39,74 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 
   return createUser;
 };
+// create Businessman
+const createBusinessmanToDB = async (
+  payload: Partial<IUser>
+): Promise<IUser> => {
+  //set role
+  payload.role = USER_ROLES.BUSINESSMAN;
+  const createUser = await User.create(payload);
+  if (!createUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+  }
 
+  //send email
+  const otp = generateOTP(6);
+  const values = {
+    name: createUser.name,
+    otp: otp,
+    email: createUser.email!,
+  };
+  const createAccountTemplate = emailTemplate.createAccount(values);
+  emailHelper.sendEmail(createAccountTemplate);
+
+  //save to DB
+  const authentication = {
+    oneTimeCode: otp,
+    expireAt: new Date(Date.now() + 3 * 60000),
+  };
+  await User.findOneAndUpdate(
+    { _id: createUser._id },
+    { $set: { authentication } }
+  );
+
+  return createUser;
+};
+// create Admin
+const createAdminToDB = async (
+  payload: Partial<IUser>
+): Promise<IUser> => {
+  //set role
+  payload.role = USER_ROLES.ADMIN;
+  const createAdmin = await User.create(payload);
+  if (!createAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create admin');
+  }
+
+  //send email
+  const otp = generateOTP(6);
+  const values = {
+    name: createAdmin.name,
+    otp: otp,
+    email: createAdmin.email!,
+  };
+  const createAccountTemplate = emailTemplate.createAccount(values);
+  emailHelper.sendEmail(createAccountTemplate);
+
+  //save to DB
+  const authentication = {
+    oneTimeCode: otp,
+    expireAt: new Date(Date.now() + 3 * 60000),
+  };
+  await User.findOneAndUpdate(
+    { _id: createAdmin._id },
+    { $set: { authentication } }
+  );
+
+  return createAdmin;
+};
+
+// get user profile
 const getUserProfileFromDB = async (
   user: JwtPayload
 ): Promise<Partial<IUser>> => {
@@ -52,6 +119,7 @@ const getUserProfileFromDB = async (
   return isExistUser;
 };
 
+// update user profile
 const updateProfileToDB = async (
   user: JwtPayload,
   payload: Partial<IUser>
@@ -78,4 +146,5 @@ export const UserService = {
   createUserToDB,
   getUserProfileFromDB,
   updateProfileToDB,
+  createBusinessmanToDB,
 };

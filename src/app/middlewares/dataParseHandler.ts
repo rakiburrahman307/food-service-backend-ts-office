@@ -1,19 +1,14 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { StatusCodes } from 'http-status-codes';
+import { Request, Response, NextFunction } from 'express';
 
-const dataParseHandler: RequestHandler = (req, res, next) => {
+const parseJsonMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (req.body.data && typeof req.body.data === 'string') {
+    if (req.body && req.body.data) {
       req.body = JSON.parse(req.body.data);
     }
     next();
   } catch (error) {
-    // Handle JSON parsing errors
-    res.status(StatusCodes.BAD_REQUEST).json({
-      success: false,
-      message: 'Invalid JSON data in request body',
-    });
+    next(error);
   }
 };
 
-export default dataParseHandler;
+export default parseJsonMiddleware;

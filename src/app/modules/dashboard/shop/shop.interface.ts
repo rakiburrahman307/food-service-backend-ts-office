@@ -1,3 +1,5 @@
+import mongoose, { Model } from 'mongoose';
+
 // Shop Schema Interface
 export interface TBankCard {
   cardNumber: string;
@@ -6,6 +8,7 @@ export interface TBankCard {
   cvv: string;
 }
 export interface TShop extends Document {
+  userId: mongoose.Types.ObjectId;
   shopName: string;
   shopOwnerName: string;
   shopLicence: string;
@@ -21,13 +24,6 @@ export interface TShop extends Document {
   turnOffShop: boolean;
 }
 
-export type TFile = {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  destination: string;
-  filename: string;
-  path: string;
-  size: number;
-};
+export type TShopModal = {
+  isExistShopById(id: mongoose.Types.ObjectId): any;
+} & Model<TShop>;

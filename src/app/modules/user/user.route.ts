@@ -30,4 +30,10 @@ router
     UserController.createUser
   );
 
+router.post(
+  '/create-businessman',
+  validateRequest(UserValidation.createBusinessUserZodSchema),
+  UserController.createBusinessman
+);
+
 export const UserRoutes = router;

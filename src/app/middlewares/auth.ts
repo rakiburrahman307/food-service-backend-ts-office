@@ -4,6 +4,7 @@ import { Secret } from 'jsonwebtoken';
 import config from '../../config';
 import ApiError from '../../errors/ApiError';
 import { jwtHelper } from '../../helpers/jwtHelper';
+import { User } from '../modules/user/user.model';
 
 const auth =
   (...roles: string[]) =>
@@ -22,11 +23,13 @@ const auth =
           token,
           config.jwt.jwt_secret as Secret
         );
+        const user = await User.isExistUserById(verifyUser.id);
+
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'This user is not found !');
+    }
         //set user to header
         req.user = verifyUser;
-
-        console.log(verifyUser)
-        console.log("role",roles)
         //guard user
         if (roles.length && !roles.includes(verifyUser.role)) {
           throw new ApiError(

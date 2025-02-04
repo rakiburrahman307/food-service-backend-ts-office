@@ -16,6 +16,17 @@ const createUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createBusinessman = catchAsync(async (req, res) => {
+  const { ...userData } = req.body;
+  const result = await UserService.createBusinessmanToDB(userData);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Business User created successfully',
+    data: result,
+  });
+});
 
 const getUserProfile = catchAsync(async (req, res) => {
   const user = req.user;
@@ -50,4 +61,9 @@ const updateProfile = catchAsync(
   }
 );
 
-export const UserController = { createUser, getUserProfile, updateProfile };
+export const UserController = {
+  createUser,
+  getUserProfile,
+  updateProfile,
+  createBusinessman,
+};

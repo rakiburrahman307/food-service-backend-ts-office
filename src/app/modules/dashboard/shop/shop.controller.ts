@@ -1,13 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
-import catchAsync from '../../../shared/catchAsync';
-import sendResponse from '../../../shared/sendResponse';
+import catchAsync from '../../../../shared/catchAsync';
+import sendResponse from '../../../../shared/sendResponse';
 import { ShopService } from './shop.service';
 
 const createShop = catchAsync(async (req, res) => {
+  const user = req.user;
   const { ...shopData } = req.body;
   const files: any = req.files;
-  const result = await ShopService.createShop(files, shopData);
-
+  const result = await ShopService.createShop(user, files, shopData);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,
@@ -16,11 +16,12 @@ const createShop = catchAsync(async (req, res) => {
   });
 });
 const updateShop = catchAsync(async (req, res) => {
+  const user = req.user;
   const id = req?.params?.id;
   console.log(id);
   const { ...shopData } = req.body;
   const files: any = req.files;
-  const result = await ShopService.updateShopInfo(id, files, shopData);
+  const result = await ShopService.updateShopInfo(user, id, files, shopData);
 
   sendResponse(res, {
     success: true,

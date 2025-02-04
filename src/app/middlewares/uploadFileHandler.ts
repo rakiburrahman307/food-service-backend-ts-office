@@ -36,7 +36,7 @@ const uploadFileHandler = () => {
 
   const upload = multer({
     storage: storage,
-  }).any(); // Allow dynamic field names
+  }).any();
 
   return (req: Request, res: any, next: any) => {
     upload(req, res, (err: any) => {

@@ -1,9 +1,16 @@
 import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../../errors/ApiError';
-import { TFile, TShop } from './shop.interface';
+import ApiError from '../../../../errors/ApiError';
+import {  TShop } from './shop.interface';
 import ShopModel from './shop.model';
+import { JwtPayload } from 'jsonwebtoken';
+import { User } from '../../user/user.model';
+import { TFile } from '../../../../types/files';
 
-const createShop = async (files: TFile[], payload: Partial<TShop>) => {
+const createShop = async (
+  user: JwtPayload,
+  files: TFile[],
+  payload: Partial<TShop>
+) => {
   // Process files and update payload
   if (files && files.length > 0) {
     files.forEach(file => {
@@ -15,8 +22,8 @@ const createShop = async (files: TFile[], payload: Partial<TShop>) => {
       }
     });
   }
-
   const shopData = {
+    userId: user.id,
     ...payload,
   };
   const createShop = await ShopModel.create(shopData);
@@ -29,6 +36,7 @@ const createShop = async (files: TFile[], payload: Partial<TShop>) => {
   return createShop;
 };
 const updateShopInfo = async (
+  user: JwtPayload,
   id: string,
   files: TFile[],
   payload: Partial<TShop>

@@ -1,5 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
-import { TBankCard, TShop } from './shop.interface';
+import mongoose, { ObjectId, Schema } from 'mongoose';
+import { TBankCard, TShop, TShopModal } from './shop.interface';
 
 const BankCardSchema = new Schema<TBankCard>({
   cardNumber: {
@@ -23,8 +23,13 @@ const BankCardSchema = new Schema<TBankCard>({
   },
 });
 
-const ShopSchema: Schema<TShop> = new Schema(
+const shopSchema: Schema<TShop> = new Schema(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     shopName: {
       type: String,
       required: [true, 'Shop name is required'],
@@ -102,5 +107,10 @@ const ShopSchema: Schema<TShop> = new Schema(
   { timestamps: true }
 );
 
-const ShopModel = mongoose.model<TShop>('Shops', ShopSchema);
+shopSchema.statics.isExistShopById = async (id: Schema.Types.ObjectId) => {
+  const isExist = await ShopModel.findById(id);
+  return isExist;
+};
+
+const ShopModel = mongoose.model<TShop, TShopModal>('Shops', shopSchema);
 export default ShopModel;
