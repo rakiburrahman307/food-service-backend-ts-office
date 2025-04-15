@@ -1,9 +1,11 @@
+import mongoose from 'mongoose';
 import { User } from '../app/modules/user/user.model';
 import config from '../config';
 import { USER_ROLES } from '../enums/user';
 import { logger } from '../shared/logger';
+import bcrypt from 'bcrypt';
 
-const payload = [
+const usersData = [
   {
     name: 'Administrator',
     email: config.super_admin.email,
@@ -33,7 +35,33 @@ const payload = [
   },
 ];
 
-export const seedSuperAdmin = async () => {
+const hashPassword = async (password: string) => {
+  const salt = await bcrypt.hash(password, Number(config.bcrypt_salt_rounds));
+  return await bcrypt.hash(password, salt);
+};
+
+const seedUsers = async () => {
+  try {
+    await User.deleteMany();
+    const hashedUsersData = await Promise.all(
+      usersData.map(async (user:any) => {
+        const hashedPassword = await hashPassword(user.password);
+        return { ...user, password: hashedPassword }; // Replace the password with the hashed one
+      }),
+    );
+    await User.insertMany(hashedUsersData);
+
+    console.log('Users seeded successfully!');
+  } catch (err) {
+    console.error('Error seeding users:', err);
+  }
+};
+
+
+// Connect to MongoDB
+mongoose.connect(config.database_url as string);
+
+ const seedSuperAdmin = async () => {
   try {
     const isExistSuperAdmin = await User.findOne({
       email: config.super_admin.email,
@@ -42,11 +70,15 @@ export const seedSuperAdmin = async () => {
 
     if (!isExistSuperAdmin) {
       // Since password hashing is handled in the pre-save middleware, no need to manually hash passwords here
-      await User.create(payload);  // Create users without manually hashing passwords
+      await seedUsers();  // Create users without manually hashing passwords
 
       logger.info('✨ Super Admin account has been successfully created!');
     }
   } catch (error) {
     logger.error('Error creating Super Admin:', error);
+  }finally {
+    mongoose.disconnect();
   }
 };
+
+seedSuperAdmin()

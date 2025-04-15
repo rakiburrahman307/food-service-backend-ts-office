@@ -2,8 +2,7 @@ import colors from 'colors';
 import mongoose from 'mongoose';
 import { Server } from 'socket.io';
 import app from './app';
-import config from './config';
-import { seedSuperAdmin } from './DB/seedAdmin';
+import config from './config'; 
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
 
@@ -28,7 +27,7 @@ async function main() {
         logger.info(colors.green('🚀 Database connected successfully'));
 
         // Seed Super Admin after database connection is successful
-        seedSuperAdmin();
+        // seedSuperAdmin();
       })
       .catch(error => {
         errorLogger.error(colors.red('🤢 Failed to connect Database'), error);
@@ -37,6 +36,9 @@ async function main() {
 
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
+
+
+      console.log(config.ip_address)
 
     // Start the server
     server = app.listen(port, config.ip_address as string, () => {
