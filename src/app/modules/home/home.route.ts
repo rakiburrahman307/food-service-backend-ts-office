@@ -15,7 +15,6 @@ router.get('/shop/:id', HomeController.getSpacificShopFromDb);
 router.get('/shop/:id/items', HomeController.getSpacificShopItemsFromDb);
 router.get(
   '/product/:id',
-  auth(USER_ROLES.GUEST, USER_ROLES.USER),
   HomeController.getItemFromDb
 );
 router.get('/categories', HomeController.getCategorys);
