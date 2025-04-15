@@ -63,17 +63,9 @@ mongoose.connect(config.database_url as string);
 
  const seedSuperAdmin = async () => {
   try {
-    const isExistSuperAdmin = await User.findOne({
-      email: config.super_admin.email,
-      role: USER_ROLES.SUPER_ADMIN,
-    });
-
-    if (!isExistSuperAdmin) {
-      // Since password hashing is handled in the pre-save middleware, no need to manually hash passwords here
-      await seedUsers();  // Create users without manually hashing passwords
-
-      logger.info('✨ Super Admin account has been successfully created!');
-    }
+    console.log('--------------> Database seeding start <--------------');
+    await seedUsers();
+    console.log('--------------> Database seeding completed <--------------');
   } catch (error) {
     logger.error('Error creating Super Admin:', error);
   }finally {
