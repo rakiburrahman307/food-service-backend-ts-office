@@ -49,11 +49,11 @@ const userSchema = new Schema<IUser, UserModel>(
       type: String,
       default: '',
     },
-    payFastMerchantId: { // Replacing stripeAccountId with payFastMerchantId
+    stripeAccountId: { // Replacing stripeAccountId with payFastMerchantId
       type: String,
       default: '',
     },
-    payFastAccountStatus: { // Replacing stripeAccountStatus with payFastAccountStatus
+    stripeAccountStatus: { // Replacing stripeAccountStatus with payFastAccountStatus
       type: Boolean,
       default: false,
     },

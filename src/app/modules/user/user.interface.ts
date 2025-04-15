@@ -22,8 +22,8 @@ export type IUser = {
   recentSearches: [string];
   phoneCountry: string;
   phoneCountryCode: string;
-  payFastMerchantId: string;
-  payFastAccountStatus: boolean;
+  stripeAccountId: string;
+  stripeAccountStatus: boolean;
   status: 'active' | 'blocked';
   verified: boolean;
   authentication?: {
