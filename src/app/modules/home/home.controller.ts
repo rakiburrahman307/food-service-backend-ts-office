@@ -14,8 +14,7 @@ const getAllProductsFromDb = catchAsync(async (req, res) => {
   });
 });
 const getAllShopFromDb = catchAsync(async (req, res) => {
-  const { id }: any = req.user;
-  const result = await HomeService.getShops(id, req.query);
+  const result = await HomeService.getShops(req.query);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

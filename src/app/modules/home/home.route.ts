@@ -8,7 +8,6 @@ const router = express.Router();
 router.get('/products', HomeController.getAllProductsFromDb);
 router.get(
   '/shops',
-  auth(USER_ROLES.GUEST, USER_ROLES.USER),
   HomeController.getAllShopFromDb
 );
 router.get('/shop/:id', HomeController.getSpacificShopFromDb);

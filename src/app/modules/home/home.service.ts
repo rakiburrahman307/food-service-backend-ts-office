@@ -36,7 +36,6 @@ const getProducts = async (query: Record<string, unknown>) => {
 };
 
 const getShops = async (
-  userId: string | undefined,
   query: Record<string, unknown>
 ) => {
   // Get user coordinates
@@ -44,13 +43,8 @@ const getShops = async (
   let userLatitude = parseFloat(query.latitude as string);
 
   if (isNaN(userLongitude) || isNaN(userLatitude)) {
-    const user = await User.findById(userId).select('location');
-    if (user?.location?.coordinates?.length === 2) {
-      [userLongitude, userLatitude] = user.location.coordinates;
-    } else {
-      userLongitude = 0;
-      userLatitude = 0;
-    }
+    userLongitude = 0;
+    userLatitude = 0;
   }
   const blockedShop = await ShopModel.find({ status: 'blocked' }).select('_id');
   const blockedShopsIds = blockedShop.map(shop => shop._id);
