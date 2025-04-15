@@ -26,6 +26,7 @@ app.use(
       'http://localhost:5174',
       'https://ubuntu-business-dashboard.netlify.app',
       'https://ubuntu-admin-dashboard.netlify.app',
+      'https://api.foodsavr.com',
     ],
     credentials: true,
   })
