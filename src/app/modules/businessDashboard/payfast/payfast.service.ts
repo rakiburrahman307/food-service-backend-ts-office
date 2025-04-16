@@ -1,116 +1,116 @@
-import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../../../errors/ApiError';
-import { User } from '../../user/user.model';
-import { PayFastService } from '../../../builder/PayFast';
+// import { StatusCodes } from 'http-status-codes';
+// import ApiError from '../../../../errors/ApiError';
+// import { User } from '../../user/user.model';
+// import { PayFastService } from '../../../builder/PayFast';
 
-const createAccount = async (email: string, payFastMerchantId: string) => {
-  const existingUser = await User.findOne({ email });
-  if (!existingUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'This email not found!');
-  }
-  if (existingUser) {
-    if (existingUser.payFastMerchantId) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'This email already has a PayFast account linked.'
-      );
-    }
-  }
-
-  if (!payFastMerchantId) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'You must provide a valid PayFast Merchant ID.'
-    );
-  }
-
-  const updatedUser = await User.findByIdAndUpdate(
-    existingUser._id,
-    {
-      $set: { payFastMerchantId: payFastMerchantId },
-    },
-    { new: true }
-  );
-
-  if (!updatedUser) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Error linking PayFast account'
-    );
-  }
-
-  return {
-    message: 'PayFast account linked successfully',
-    payFastMerchantId: updatedUser.payFastMerchantId,
-  };
-};
-
-// const createOnboardingLink = async (
-//   email: string,
-//   returnUrl: string,
-//   refreshUrl: string
-// ) => {
-//   // Check for required parameters
-//   if (!email || !returnUrl || !refreshUrl) {
-//     throw new ApiError(
-//       StatusCodes.BAD_REQUEST,
-//       'Email, returnUrl, and refreshUrl are required'
-//     );
-//   }
+// const createAccount = async (email: string, payFastMerchantId: string) => {
 //   const existingUser = await User.findOne({ email });
 //   if (!existingUser) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found');
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'This email not found!');
+//   }
+//   if (existingUser) {
+//     if (existingUser.payFastMerchantId) {
+//       throw new ApiError(
+//         StatusCodes.BAD_REQUEST,
+//         'This email already has a PayFast account linked.'
+//       );
+//     }
 //   }
 
-//   if (!existingUser.stripeAccountId) {
+//   if (!payFastMerchantId) {
 //     throw new ApiError(
 //       StatusCodes.BAD_REQUEST,
-//       'User does not have a connected Stripe account'
+//       'You must provide a valid PayFast Merchant ID.'
 //     );
 //   }
-//   const modifiedReturnUrl = `${returnUrl}?status=success&accountId=${existingUser.stripeAccountId}`;
-//   const link = await stripeService.createAccountLink(
-//     existingUser.stripeAccountId,
-//     modifiedReturnUrl,
-//     refreshUrl
+
+//   const updatedUser = await User.findByIdAndUpdate(
+//     existingUser._id,
+//     {
+//       $set: { payFastMerchantId: payFastMerchantId },
+//     },
+//     { new: true }
 //   );
-//   return link;
+
+//   if (!updatedUser) {
+//     throw new ApiError(
+//       StatusCodes.INTERNAL_SERVER_ERROR,
+//       'Error linking PayFast account'
+//     );
+//   }
+
+//   return {
+//     message: 'PayFast account linked successfully',
+//     payFastMerchantId: updatedUser.payFastMerchantId,
+//   };
 // };
 
-const checkVendorAccountStatus = async (userId: string) => {
-  // Fetch user data from the database
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
-  }
+// // const createOnboardingLink = async (
+// //   email: string,
+// //   returnUrl: string,
+// //   refreshUrl: string
+// // ) => {
+// //   // Check for required parameters
+// //   if (!email || !returnUrl || !refreshUrl) {
+// //     throw new ApiError(
+// //       StatusCodes.BAD_REQUEST,
+// //       'Email, returnUrl, and refreshUrl are required'
+// //     );
+// //   }
+// //   const existingUser = await User.findOne({ email });
+// //   if (!existingUser) {
+// //     throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found');
+// //   }
 
-  // Check if the user has a PayFast account linked
-  if (!user.payFastMerchantId) {
-    throw new ApiError(
-      StatusCodes.NOT_FOUND,
-      "You don't have a PayFast account"
-    );
-  }
+// //   if (!existingUser.stripeAccountId) {
+// //     throw new ApiError(
+// //       StatusCodes.BAD_REQUEST,
+// //       'User does not have a connected Stripe account'
+// //     );
+// //   }
+// //   const modifiedReturnUrl = `${returnUrl}?status=success&accountId=${existingUser.stripeAccountId}`;
+// //   const link = await stripeService.createAccountLink(
+// //     existingUser.stripeAccountId,
+// //     modifiedReturnUrl,
+// //     refreshUrl
+// //   );
+// //   return link;
+// // };
 
-  // You can check the payment status through PayFast's transaction API, but account status isn't available directly like Stripe
-  const paymentStatus = await PayFastService.checkTransactionStatus(
-    user.payFastMerchantId
-  );
+// const checkVendorAccountStatus = async (userId: string) => {
+//   // Fetch user data from the database
+//   const user = await User.findById(userId);
+//   if (!user) {
+//     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+//   }
 
-  // If the status is confirmed, it means the account is active and capable of receiving payments
-  const newStatus = paymentStatus === 'completed'; // Assuming 'completed' means the account is ready
+//   // Check if the user has a PayFast account linked
+//   if (!user.payFastMerchantId) {
+//     throw new ApiError(
+//       StatusCodes.NOT_FOUND,
+//       "You don't have a PayFast account"
+//     );
+//   }
 
-  await User.findByIdAndUpdate(userId, {
-    $set: {
-      payFastAccountStatus: newStatus,
-    },
-  });
+//   // You can check the payment status through PayFast's transaction API, but account status isn't available directly like Stripe
+//   const paymentStatus = await PayFastService.checkTransactionStatus(
+//     user.payFastMerchantId
+//   );
 
-  return newStatus; // true if the account is active, false otherwise
-};
+//   // If the status is confirmed, it means the account is active and capable of receiving payments
+//   const newStatus = paymentStatus === 'completed'; // Assuming 'completed' means the account is ready
 
-export const PayFastPaymentService = {
-  createAccount,
-  // createOnboardingLink,
-  checkVendorAccountStatus,
-};
+//   await User.findByIdAndUpdate(userId, {
+//     $set: {
+//       payFastAccountStatus: newStatus,
+//     },
+//   });
+
+//   return newStatus; // true if the account is active, false otherwise
+// };
+
+// export const PayFastPaymentService = {
+//   createAccount,
+//   // createOnboardingLink,
+//   checkVendorAccountStatus,
+// };
