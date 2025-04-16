@@ -22,7 +22,7 @@ import { EarningRoutesBusiness } from '../app/modules/businessDashboard/earning/
 import { HelpRoutes } from '../app/modules/contactUs/contact.route';
 import { AlertRoutes } from '../app/modules/alert/alert.route';
 import SettingsRouter from '../app/modules/sattings/sattings.route';
-import { PayfastRoutes } from '../app/modules/businessDashboard/payfast/payfast.route';
+
 
 const router = express.Router();
 
@@ -46,11 +46,6 @@ const apiRoutes = [
   {
     path: '/dashboard',
     route: OffersRoutes,
-  },
-
-  {
-    path: '/dashboard',
-    route: PayfastRoutes,
   },
   {
     path: '/admin/dashboard',
