@@ -46,11 +46,12 @@ const getShops = async (
     userLongitude = 0;
     userLatitude = 0;
   }
+  // query.maxDistance
+  //   ? parseFloat(query.maxDistance as string) * 1000
+  //   :
   const blockedShop = await ShopModel.find({ status: 'blocked' }).select('_id');
   const blockedShopsIds = blockedShop.map(shop => shop._id);
-  const maxDistance = query.maxDistance
-    ? parseFloat(query.maxDistance as string) * 1000
-    : 1500000;
+  const maxDistance = 1500000;
 
   const db = ShopModel.collection;
   const pipeline: any[] = [];
