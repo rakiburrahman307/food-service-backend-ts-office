@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import OfferModel from '../businessDashboard/offers/offers.model';
 import MealModel from '../businessDashboard/meal/meal.model';
+import { updateShopsWithTopCategories } from '../../../helpers/updateCategory';
 
 const checkExpiredOffers = async () => {
   try {
@@ -49,11 +50,25 @@ const checkExpiredOffers = async () => {
     console.error('Error updating expired offers:', error);
   }
 };
+const findShopIds = async () => {
+  const shops = await OfferModel.find({});
+  if (shops.length === 0) {
+    console.log('No shops found');
+    return;
+  }
+  const updatePromises = shops.map(async shop => {
+    const shopId: any = shop._id;
+    await updateShopsWithTopCategories(shopId);
+  });
+  await Promise.all(updatePromises);
+  console.log('All shops updated');
+};
 
 // Schedule job to run every day at 00:00 (midnight)
 export const startCheckOfferJob = () => {
   cron.schedule('0 0 * * *', async () => {
     console.log('Running scheduled job: Checking expired offers...');
     await checkExpiredOffers();
+    await findShopIds();
   });
 };
